@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Universo del Espacio Latente Interactivo — Juancito Peña</title>
+  
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Orbitron:wght@500;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-dark: #03060f;
+      --card-bg: rgba(9, 15, 32, 0.85);
+      --border-glow: rgba(56, 189, 248, 0.15);
+      --neon-blue: #00f3ff;
+      --neon-purple: #a855f7;
+      --neon-cyan: #06b6d4;
+      --neon-green: #10b981;
+      --neon-rose: #f43f5e;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #f1f5f9;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.04) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.04) 0%, transparent 50%);
+    }
+
+    h1, h2, h3, h4, h5, .font-orbitron {
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.5px;
+    }
+
+    .code-font {
+      font-family: 'Fira Code', monospace;
+    }
+
+    #universe-container {
+      width: 100%;
+      height: 680px;
+      border-radius: 16px;
+      position: relative;
+      background: radial-gradient(circle at center, #060b1c 0%, #010307 100%);
+      border: 2px solid rgba(56, 189, 248, 0.25);
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(14, 165, 233, 0.15) inset, 0 0 20px rgba(0, 243, 255, 0.1);
+      cursor: grab;
+    }
+
+    #universe-container:active {
+      cursor: grabbing;
+    }
+
+    #canvas3d {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .glass-panel {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 14px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+      transition: border-color 0.3s ease;
+    }
+
+    .glass-panel:hover {
+      border-color: rgba(56, 189, 248, 0.25);
+    }
+
+    .cluster-badge {
+      font-size: 0.8rem;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: left;
+    }
+
+    .cluster-badge:hover, .cluster-badge.active {
+      transform: translateY(-2px);
+      background: rgba(56, 189, 248, 0.12);
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+    }
+
+    .hologram-hud {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      z-index: 10;
+      pointer-events: none;
+      background: rgba(3, 6, 15, 0.85);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .hud-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #38bdf8;
+      margin-bottom: 2px;
+    }
+
+    .hud-coords {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.68rem;
+      color: #94a3b8;
+    }
+
+    .interactive-hud {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .attention-link-card {
+      background: rgba(30, 41, 59, 0.4);
+      border-left: 3px solid #38bdf8;
+      border-radius: 0 8px 8px 0;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      font-size: 0.82rem;
+      transition: all 0.2s ease;
+    }
+
+    .attention-link-card:hover {
+      background: rgba(56, 189, 248, 0.08);
+      transform: translateX(3px);
+    }
+
+    .step-glow {
+      transition: all 0.4s ease;
+      border-left: 3px solid #1e293b;
+      padding-left: 14px;
+    }
+
+    .step-glow.active {
+      border-left-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.08);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .pulse-btn {
+      animation: pulseGlow 2.5s infinite;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+    }
+    
+    .author-signature {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 4px 12px;
+      border-radius: 14px;
+      font-size: 0.78rem;
+    }
+
+    #hover-info {
+      position: absolute;
+      background: rgba(1, 3, 7, 0.9);
+      border: 1px solid var(--neon-blue);
+      padding: 6px 12px;
+      border-radius: 6px;
+      pointer-events: none;
+      display: none;
+      font-size: 0.8rem;
+      z-index: 100;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+    }
+  </style>
+</head>
+<body class="py-4">
+
+  <div class="container-fluid px-lg-5">
+    
+    <!-- Encabezado -->
+    <header class="d-flex flex-wrap align-items-center justify-content-between mb-3 pb-3 border-bottom border-secondary border-opacity-25 gap-2">
+      <div>
+        <h3 class="fw-bold mb-0 text-info font-orbitron">
+          <i class="bi bi-globe2 me-2 animate-spin"></i>El Universo del Espacio Latente: Planeta Conceptual
+        </h3>
+        <p class="text-secondary mb-0 small">
+          Navegación espacial 3D: Explora, gira, haz zoom y selecciona conceptos para ver cómo los conecta la inteligencia artificial.
+        </p>
+      </div>
+      <div class="d-flex gap-3 align-items-center">
+        <span class="badge bg-primary bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-2 code-font">
+          <i class="bi bi-cpu me-1"></i>Espacio Vectorial Activo
+        </span>
+        <div class="author-signature text-light font-orbitron">
+          <i class="bi bi-code-branch text-info me-1"></i>Autor: <strong class="text-info">Juancito Peña</strong>
+        </div>
+      </div>
+    </header>
+
+    <div class="row g-4">
+      
+      <!-- COLUMNA IZQUIERDA: Centro de Mando e Inferencia Semántica -->
+      <div class="col-lg-4 col-xl-4">
+        
+        <!-- Input & Navegador -->
+        <div class="glass-panel p-4 mb-3">
+          <label class="form-label fw-semibold text-light small mb-2 text-uppercase font-orbitron">
+            <i class="bi bi-compass me-1 text-info animate-pulse"></i>1. Explorar el Universo de Datos:
+          </label>
+          
+          <div class="input-group mb-3">
+            <input type="text" id="userQuery" class="form-control bg-black border-secondary text-light p-2" 
+                   value="¿Puede la inteligencia artificial tener consciencia y ética?">
+            <button class="btn btn-primary fw-bold px-3 pulse-btn" id="btnExplore">
+              <i class="bi bi-search me-1"></i>Explorar
+            </button>
+          </div>
+
+          <div class="small text-secondary mb-2 fw-semibold text-uppercase font-orbitron" style="font-size:0.7rem">
+            Selecciona un Sector para Enlazar en 3D:
+          </div>
+          <div class="d-flex flex-column gap-2 mb-1" id="presets-container">
+            <button class="btn btn-sm text-start text-truncate cluster-badge active" id="btn-filo"
+                    onclick="setQuery('¿Puede la inteligencia artificial tener consciencia y ética?', 'btn-filo')">
+              🧠 <strong>IA & Filosofía:</strong> Consciencia, Ética y Alineación
+            </button>
+            <button class="btn btn-sm text-start text-truncate cluster-badge" id="btn-fis"
+                    onclick="setQuery('¿Cómo explica la física cuántica el origen del universo?', 'btn-fis')">
+              🌌 <strong>Física & Cosmología:</strong> Gravedad, Cuántica y Cosmos
+            </button>
+            <button class="btn btn-sm text-start text-truncate cluster-badge" id="btn-bio"
+                    onclick="setQuery('La evolución biológica y los algoritmos genéticos', 'btn-bio')">
+              🧬 <strong>Biología & Cómputo:</strong> Selección Natural y Genética
+            </button>
+            <button class="btn btn-sm text-start text-truncate cluster-badge" id="btn-arte"
+                    onclick="setQuery('La metáfora poética y las matemáticas del lenguaje', 'btn-arte')">
+              🎨 <strong>Arte & Lenguaje:</strong> Metáforas, Sintaxis y Poesía
+            </button>
+          </div>
+        </div>
+
+        <!-- Proceso de Razonamiento del LLM -->
+        <div class="glass-panel p-4 mb-3">
+          <div class="small fw-bold text-uppercase text-secondary mb-3 font-orbitron">
+            <i class="bi bi-layers-half me-1"></i>Paso de Inferencia Activo
+          </div>
+
+          <div class="step-glow active mb-3" id="phase1">
+            <div class="fw-semibold text-info small"><i class="bi bi-compass me-1"></i>1. Proyección Latente</div>
+            <p class="text-secondary small mb-0" style="font-size: 0.8rem;">La frase se mapea a coordenadas matemáticas 3D y la cámara vuela de inmediato al cúmulo correspondiente.</p>
+          </div>
+
+          <div class="step-glow mb-3" id="phase2">
+            <div class="fw-semibold text-primary small"><i class="bi bi-cpu me-1"></i>2. Activación de Nodos</div>
+            <p class="text-secondary small mb-0" style="font-size: 0.8rem;">Las esferas y conceptos se iluminan y agrandan en el espacio por afinidad y relevancia de atención.</p>
+          </div>
+
+          <div class="step-glow mb-0" id="phase3">
+            <div class="fw-semibold text-success small"><i class="bi bi-bezier2 me-1"></i>3. Puentes de Atención Cruzada</div>
+            <p class="text-secondary small mb-0" style="font-size: 0.8rem;">Se trazan múltiples conexiones de energía uniendo los distintos nodos para generar la respuesta.</p>
+          </div>
+        </div>
+
+        <!-- Conexiones descubiertas -->
+        <div class="glass-panel p-4">
+          <div class="small fw-bold text-uppercase text-secondary mb-3 font-orbitron">
+            <i class="bi bi-diagram-3 me-1"></i>Puentes de Atención Activados
+          </div>
+          <div id="linksContainer" style="max-height: 180px; overflow-y: auto;">
+            <div class="text-muted small">Haz clic en Explorar o selecciona un sector para ver los puentes de red.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUMNA DERECHA: El Universo / Planeta 3D Totalmente Interactive -->
+      <div class="col-lg-8 col-xl-8">
+        <div class="glass-panel p-2 h-100 position-relative">
+          
+          <div id="universe-container">
+            <!-- Capa de hover de información 3D -->
+            <div id="hover-info">Concepto</div>
+
+            <!-- HUD de Telemetría -->
+            <div class="hologram-hud">
+              <div class="hud-title font-orbitron"><i class="bi bi-broadcast me-1"></i>Coordenadas Semánticas 3D</div>
+              <div class="hud-coords" id="coordsDisplay">X: 0.000 | Y: 0.000 | Z: 0.000</div>
+              <div class="hud-coords text-info font-orbitron mt-1" id="activeClusterDisplay" style="font-size:0.65rem">SECTOR: EN ESPERA</div>
+            </div>
+
+            <!-- Controles HUD Interactivos -->
+            <div class="interactive-hud">
+              <button class="btn btn-sm btn-dark border-secondary opacity-90" onclick="resetCamera()" title="Restaurar vista global">
+                <i class="bi bi-arrows-fullscreen"></i> Vista Global
+              </button>
+              <button class="btn btn-sm btn-dark border-secondary opacity-90" onclick="zoomIn()" title="Aumentar zoom">
+                <i class="bi bi-zoom-in"></i> Acercar
+              </button>
+              <button class="btn btn-sm btn-dark border-secondary opacity-90" onclick="zoomOut()" title="Disminuir zoom">
+                <i class="bi bi-zoom-out"></i> Alejar
+              </button>
+            </div>
+
+            <canvas id="canvas3d"></canvas>
+          </div>
+
+          <!-- Pie del Visor interactivo -->
+          <div class="d-flex flex-wrap justify-content-between align-items-center mt-2 px-2 text-secondary small gap-2">
+            <div class="d-flex flex-wrap gap-3" style="font-size:0.75rem">
+              <span><span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background: #38bdf8;"></span>Filosofía</span>
+              <span><span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background: #a855f7;"></span>Tecnología & IA</span>
+              <span><span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background: #06b6d4;"></span>Física</span>
+              <span><span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background: #10b981;"></span>Biología</span>
+              <span><span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background: #f43f5e;"></span>Arte & Lenguaje</span>
+            </div>
+            <div class="text-info-emphasis">
+              <i class="bi bi-cursor-fill me-1"></i> <strong>Clica o toca cualquier esfera</strong> para enlazarla con el resto del universo
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Three.js, OrbitControls y GSAP para transiciones de cámara suaves -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <script>
+    // ==============================================================
+    // 1. BASE DE DATOS Y MAPAS DE CONEXIÓN DE CONCEPTO SÉMANTICO
+    // ==============================================================
+    const KNOWLEDGE_CONTINENTS = [
+      {
+        id: 'tech_ai',
+        name: 'Tecnología & IA',
+        color: 0xa855f7,
+        hex: '#a855f7',
+        center: new THREE.Vector3(6, 2, 4),
+        nodes: ['Redes Neuronales', 'Algoritmos', 'Embeddings', 'Cómputo', 'Transformers', 'Inferencia', 'Alineación', 'Finetuning', 'Deep Learning', 'GPU', 'Parámetros']
+      },
+      {
+        id: 'philosophy',
+        name: 'Filosofía & Consciencia',
+        color: 0x38bdf8,
+        hex: '#38bdf8',
+        center: new THREE.Vector3(4, 5, -4),
+        nodes: ['Consciencia', 'Ética', 'Epistemología', 'Existencia', 'Mente Humana', 'Cognición', 'Moral', 'Fenomenología', 'Lógica', 'Ontología']
+      },
+      {
+        id: 'physics',
+        name: 'Física Cuántica & Cosmos',
+        color: 0x06b6d4,
+        hex: '#06b6d4',
+        center: new THREE.Vector3(-6, 3, 3),
+        nodes: ['Entrelazamiento', 'Relatividad', 'Espacio-Tiempo', 'Gravedad', 'Partículas', 'Cosmología', 'Singularidad', 'Entropía', 'Átomos', 'Cuántica']
+      },
+      {
+        id: 'biology',
+        name: 'Biología & Evolución',
+        color: 0x10b981,
+        hex: '#10b981',
+        center: new THREE.Vector3(-4, -4, 4),
+        nodes: ['Genética', 'Selección Natural', 'Célula', 'ADN', 'Ecosistemas', 'Evolución', 'Biomas', 'Herencia', 'Especies', 'Mutaciones']
+      },
+      {
+        id: 'art_lang',
+        name: 'Arte, Lenguaje & Poesía',
+        color: 0xf43f5e,
+        hex: '#f43f5e',
+        center: new THREE.Vector3(3, -4, -4),
+        nodes: ['Metáfora', 'Poesía', 'Sintaxis', 'Simbolismo', 'Estética', 'Métrica', 'Narratología', 'Semiología', 'Literatura', 'Semántica']
+      }
+    ];
+
+    const QUERY_ROUTING = [
+      {
+        match: ['consciencia', 'ética', 'inteligencia', 'ia'],
+        targetPos: new THREE.Vector3(5, 3.5, 0),
+        activeContinent: 'Filosofía ↔ Tecnología & IA',
+        primaryNodes: ['Consciencia', 'Ética', 'Redes Neuronales', 'Mente Humana', 'Alineación', 'Transformers'],
+        crossLinks: [
+          { from: 'Redes Neuronales', to: 'Mente Humana', weight: 0.94, desc: 'Isomorfismo conceptual de la mente artificial.' },
+          { from: 'Ética', to: 'Algoritmos', weight: 0.88, desc: 'Alineación e integración de valores en algoritmos.' },
+          { from: 'Consciencia', to: 'Transformers', weight: 0.81, desc: 'Introspección y simulación de lenguaje.' },
+          { from: 'Alineación', to: 'Moral', weight: 0.89, desc: 'Gobernanza y control ético del deep learning.' }
+        ]
+      },
+      {
+        match: ['cuántica', 'universo', 'física', 'realidad'],
+        targetPos: new THREE.Vector3(-6, 3, 3),
+        activeContinent: 'Física Cuántica ↔ Filosofía',
+        primaryNodes: ['Entrelazamiento', 'Espacio-Tiempo', 'Existencia', 'Cuántica', 'Singularidad', 'Cosmología'],
+        crossLinks: [
+          { from: 'Entrelazamiento', to: 'Epistemología', weight: 0.96, desc: 'La no-localidad en el entrelazamiento cuántico.' },
+          { from: 'Espacio-Tiempo', to: 'Relatividad', weight: 0.91, desc: 'La estructura geométrica del continuo universal.' },
+          { from: 'Cuántica', to: 'Existencia', weight: 0.84, desc: 'La definición material ontológica de la realidad.' },
+          { from: 'Singularidad', to: 'Cosmología', weight: 0.87, desc: 'Punto de densidad infinita en la evolución del cosmos.' }
+        ]
+      },
+      {
+        match: ['biológica', 'genéticos', 'evolución', 'algoritmos'],
+        targetPos: new THREE.Vector3(-2, -2, 4),
+        activeContinent: 'Biología ↔ Algoritmos',
+        primaryNodes: ['Selección Natural', 'Algoritmos', 'Genética', 'ADN', 'Ecosistemas', 'Evolución'],
+        crossLinks: [
+          { from: 'Selección Natural', to: 'Algoritmos', weight: 0.95, desc: 'Procesos de optimización natural aplicados al código.' },
+          { from: 'ADN', to: 'Cómputo', weight: 0.89, desc: 'Criptografía y almacenamiento de secuencias naturales.' },
+          { from: 'Ecosistemas', to: 'Evolución', weight: 0.82, desc: 'Modelado adaptativo frente a cambios en biomas.' }
+        ]
+      },
+      {
+        match: ['poética', 'matemáticas', 'lenguaje', 'metáfora'],
+        targetPos: new THREE.Vector3(3.5, -3, -4),
+        activeContinent: 'Arte & Lenguaje ↔ Matemáticas',
+        primaryNodes: ['Metáfora', 'Sintaxis', 'Simbolismo', 'Poesía', 'Embeddings', 'Semántica'],
+        crossLinks: [
+          { from: 'Metáfora', to: 'Embeddings', weight: 0.93, desc: 'Proyección geométrica de la cercanía conceptual.' },
+          { from: 'Sintaxis', to: 'Algoritmos', weight: 0.87, desc: 'Modelación por reglas formales de lingüística.' },
+          { from: 'Poesía', to: 'Mente Humana', weight: 0.84, desc: 'Carga emocional y expresión subjetiva.' }
+        ]
+      }
+    ];
+
+    // ==============================================================
+    // 2. CONFIGURACIÓN DEL ENTORNO THREE.JS E INTERACTIVIDAD
+    // ==============================================================
+    const container = document.getElementById('universe-container');
+    const canvas = document.getElementById('canvas3d');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(0, 0, 30);
+
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxDistance = 60;
+    controls.minDistance = 5;
+
+    // Luces
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    const pointLight = new THREE.PointLight(0x00f3ff, 2, 80);
+    pointLight.position.set(0, 15, 20);
+    scene.add(pointLight);
+
+    const extraLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    extraLight.position.set(5, 5, 5);
+    scene.add(extraLight);
+
+    const universeGroup = new THREE.Group();
+    scene.add(universeGroup);
+
+    // Sistema de selección y rayos de selección (Raycasting)
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const hoverInfo = document.getElementById('hover-info');
+    const conceptMeshes = [];
+
+    // Partículas ambientales de fondo
+    function buildPointCloud() {
+      const particleCount = 1200;
+      const geom = new THREE.BufferGeometry();
+      const positions = [];
+      const colors = [];
+
+      for (let i = 0; i < particleCount; i++) {
+        const theta = Math.random() * 2 * Math.PI;
+        const phi = Math.acos(2 * Math.random() - 1);
+        const r = 8 + Math.random() * 6;
+
+        positions.push(
+          r * Math.sin(phi) * Math.cos(theta),
+          r * Math.sin(phi) * Math.sin(theta),
+          r * Math.cos(phi)
+        );
+
+        const c = new THREE.Color();
+        c.setHSL(0.55 + Math.random() * 0.35, 0.7, 0.45);
+        colors.push(c.r, c.g, c.b);
+      }
+
+      geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+      const mat = new THREE.PointsMaterial({ size: 0.1, vertexColors: true, transparent: true, opacity: 0.35 });
+      universeGroup.add(new THREE.Points(geom, mat));
+    }
+    buildPointCloud();
+
+    // Fabricación de nodos y sprites de nombres
+    function createNameSprite(name, hexColor) {
+      const c = document.createElement('canvas');
+      c.width = 128; c.height = 32;
+      const ctx = c.getContext('2d');
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillStyle = hexColor;
+      ctx.textAlign = 'center';
+      ctx.fillText(name, 64, 16);
+
+      const tex = new THREE.CanvasTexture(c);
+      const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      const sprite = new THREE.Sprite(spriteMat);
+      sprite.scale.set(3, 0.75, 1);
+      return sprite;
+    }
+
+    function buildNodeUniverse() {
+      const geo = new THREE.SphereGeometry(0.3, 16, 16);
+
+      KNOWLEDGE_CONTINENTS.forEach(continent => {
+        // Núcleo principal
+        const coreMat = new THREE.MeshStandardMaterial({
+          color: continent.color,
+          emissive: continent.color,
+          emissiveIntensity: 0.65,
+          roughness: 0.3
+        });
+        const coreMesh = new THREE.Mesh(new THREE.SphereGeometry(0.65, 16, 16), coreMat);
+        coreMesh.position.copy(continent.center);
+        coreMesh.userData = { isCore: true, name: continent.name, continentId: continent.id, color: continent.color, hex: continent.hex };
+        universeGroup.add(coreMesh);
+        conceptMeshes.push(coreMesh);
+
+        // Satélites
+        continent.nodes.forEach((node, idx) => {
+          const phi = (idx / continent.nodes.length) * Math.PI * 2;
+          const dist = 3.5;
+          const offset = new THREE.Vector3(
+            Math.cos(phi) * dist,
+            Math.sin(phi) * (dist * 0.7),
+            (Math.sin(idx) * 1.5)
+          );
+
+          const nodePos = continent.center.clone().add(offset);
+          const mat = new THREE.MeshStandardMaterial({
+            color: continent.color,
+            emissive: continent.color,
+            emissiveIntensity: 0.22,
+            roughness: 0.4
+          });
+
+          const mesh = new THREE.Mesh(geo, mat);
+          mesh.position.copy(nodePos);
+          mesh.userData = { isCore: false, name: node, continentId: continent.id, color: continent.color, hex: continent.hex };
+          universeGroup.add(mesh);
+          conceptMeshes.push(mesh);
+
+          const spr = createNameSprite(node, continent.hex);
+          spr.position.set(nodePos.x, nodePos.y + 0.45, nodePos.z);
+          universeGroup.add(spr);
+          mesh.userData.label = spr;
+        });
+      });
+    }
+    buildNodeUniverse();
+
+    // Conexiones eléctricas y fotones
+    let activeLines = [];
+    let activePhotons = [];
+
+    function clearNetworkLinks() {
+      activeLines.forEach(l => universeGroup.remove(l));
+      activePhotons.forEach(p => universeGroup.remove(p.mesh));
+      activeLines = [];
+      activePhotons = [];
+
+      conceptMeshes.forEach(m => {
+        m.material.emissiveIntensity = 0.22;
+        m.scale.set(1, 1, 1);
+      });
+    }
+
+    function createDynamicLink(posA, posB, colorHex) {
+      const mid = new THREE.Vector3().addVectors(posA, posB).multiplyScalar(0.5).multiplyScalar(0.7);
+      const curve = new THREE.QuadraticBezierCurve3(posA, mid, posB);
+      const points = curve.getPoints(24);
+      const geom = new THREE.BufferGeometry().setFromPoints(points);
+
+      const line = new THREE.Line(geom, new THREE.LineBasicMaterial({ color: colorHex, transparent: true, opacity: 0.8 }));
+      universeGroup.add(line);
+      activeLines.push(line);
+
+      const pMesh = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+      universeGroup.add(pMesh);
+      activePhotons.push({ mesh: pMesh, curve: curve, t: Math.random() });
+    }
+
+    // Aura de objetivo
+    const targetAura = new THREE.Mesh(
+      new THREE.RingGeometry(0.7, 0.85, 32),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide })
+    );
+    targetAura.visible = false;
+    universeGroup.add(targetAura);
+
+    // ==============================================================
+    // 3. EVENTOS DE INTERACCION DEL MOUSE Y GESTOS (RAYCASTING)
+    // ==============================================================
+    let lastCameraPos = new THREE.Vector3(0, 0, 30);
+    let targetLookAt = new THREE.Vector3(0, 0, 0);
+
+    function onPointerDown(e) {
+      const bounds = container.getBoundingClientRect();
+      mouse.x = ((e.clientX - bounds.left) / bounds.width) * 2 - 1;
+      mouse.y = -((e.clientY - bounds.top) / bounds.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(conceptMeshes);
+
+      if (intersects.length > 0) {
+        const selected = intersects[0].object;
+        linkManualConcept(selected);
+      }
+    }
+
+    function onPointerMove(e) {
+      const bounds = container.getBoundingClientRect();
+      mouse.x = ((e.clientX - bounds.left) / bounds.width) * 2 - 1;
+      mouse.y = -((e.clientY - bounds.top) / bounds.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(conceptMeshes);
+
+      if (intersects.length > 0) {
+        const selected = intersects[0].object;
+        hoverInfo.style.display = 'block';
+        hoverInfo.style.left = `${e.clientX - bounds.left + 15}px`;
+        hoverInfo.style.top = `${e.clientY - bounds.top + 15}px`;
+        hoverInfo.textContent = selected.userData.name;
+        document.body.style.cursor = 'pointer';
+      } else {
+        hoverInfo.style.display = 'none';
+        document.body.style.cursor = 'auto';
+      }
+    }
+
+    container.addEventListener('pointerdown', onPointerDown);
+    container.addEventListener('pointermove', onPointerMove);
+
+    // Acciones directas para clics manuales en nodos
+    function linkManualConcept(mesh) {
+      clearNetworkLinks();
+      
+      mesh.scale.set(1.5, 1.5, 1.5);
+      mesh.material.emissiveIntensity = 1.35;
+
+      const matchedContinent = KNOWLEDGE_CONTINENTS.find(c => c.id === mesh.userData.continentId);
+      if (!matchedContinent) return;
+
+      const linksContainer = document.getElementById('linksContainer');
+      linksContainer.innerHTML = '';
+
+      // Crear enlaces rápidos y animaciones hacia el núcleo
+      const coreNode = conceptMeshes.find(m => m.userData.isCore && m.userData.continentId === mesh.userData.continentId);
+      if (coreNode && coreNode !== mesh) {
+        createDynamicLink(mesh.position, coreNode.position, mesh.userData.color);
+        linksContainer.innerHTML += `
+          <div class="attention-link-card" style="border-left-color: ${mesh.userData.hex}">
+            <div class="d-flex justify-content-between">
+              <strong>${mesh.userData.name} &harr; ${coreNode.userData.name}</strong>
+              <span class="text-info font-orbitron" style="font-size: 0.72rem;">95% de afinidad</span>
+            </div>
+            <div class="text-secondary small mt-1">Conexión jerárquica del clúster de ${matchedContinent.name}.</div>
+          </div>
+        `;
+      }
+
+      // Vuelo de cámara suave (GSAP)
+      const offset = mesh.position.clone().normalize().multiplyScalar(12);
+      gsap.to(camera.position, { x: mesh.position.x + offset.x, y: mesh.position.y + offset.y + 2, z: mesh.position.z + offset.z, duration: 1.2, ease: "power2.out" });
+      gsap.to(controls.target, { x: mesh.position.x, y: mesh.position.y, z: mesh.position.z, duration: 1.2, ease: "power2.out" });
+
+      targetAura.position.copy(mesh.position);
+      targetAura.visible = true;
+
+      document.getElementById('coordsDisplay').textContent = `X: ${mesh.position.x.toFixed(3)} | Y: ${mesh.position.y.toFixed(3)} | Z: ${mesh.position.z.toFixed(3)}`;
+      document.getElementById('activeClusterDisplay').textContent = `NODO: ${mesh.userData.name.toUpperCase()}`;
+    }
+
+    // ==============================================================
+    // 4. BÚSQUEDA Y TRASLACIONES DE CÁMARA
+    // ==============================================================
+    const userQuery = document.getElementById('userQuery');
+    const btnExplore = document.getElementById('btnExplore');
+    const coordsDisplay = document.getElementById('coordsDisplay');
+    const activeClusterDisplay = document.getElementById('activeClusterDisplay');
+    const linksContainer = document.getElementById('linksContainer');
+
+    function setQuery(text, btnId) {
+      userQuery.value = text;
+      
+      // Control de clases activas en los botones de mando a la izquierda
+      document.querySelectorAll('#presets-container .cluster-badge').forEach(b => b.classList.remove('active'));
+      if (btnId) document.getElementById(btnId).classList.add('active');
+
+      navigateLatentSpace();
+    }
+
+    async function navigateLatentSpace() {
+      const q = userQuery.value.toLowerCase().trim();
+      if (!q) return;
+
+      btnExplore.disabled = true;
+      clearNetworkLinks();
+
+      let matched = QUERY_ROUTING.find(r => r.match.some(m => q.includes(m)));
+      if (!matched) {
+        // Fallback genérico para frases improvisadas
+        matched = {
+          targetPos: new THREE.Vector3(2, -2, 4),
+          activeContinent: 'Constelación General',
+          primaryNodes: ['Transformers', 'Mente Humana', 'Redes Neuronales', 'Inferencia'],
+          crossLinks: [
+            { from: 'Transformers', to: 'Mente Humana', weight: 0.85, desc: 'Navegación espacial de cercanía de términos.' }
+          ]
+        };
+      }
+
+      // FASE 1: Proyección en curso
+      ['phase1', 'phase2', 'phase3'].forEach(id => document.getElementById(id).classList.remove('active'));
+      document.getElementById('phase1').classList.add('active');
+
+      targetAura.position.copy(matched.targetPos);
+      targetAura.visible = true;
+
+      const camOffset = matched.targetPos.clone().normalize().multiplyScalar(15);
+      
+      // Traslaciones cinemáticas suaves por interpolación
+      gsap.to(camera.position, { x: matched.targetPos.x + camOffset.x, y: matched.targetPos.y + camOffset.y, z: matched.targetPos.z + camOffset.z, duration: 1.5, ease: "power2.inOut" });
+      gsap.to(controls.target, { x: matched.targetPos.x, y: matched.targetPos.y, z: matched.targetPos.z, duration: 1.5, ease: "power2.inOut" });
+
+      coordsDisplay.textContent = `X: ${matched.targetPos.x.toFixed(3)} | Y: ${matched.targetPos.y.toFixed(3)} | Z: ${matched.targetPos.z.toFixed(3)}`;
+      activeClusterDisplay.textContent = `SECTOR: ${matched.activeContinent}`;
+      await new Promise(r => setTimeout(r, 1200));
+
+      // FASE 2: Encendido de nodos
+      document.getElementById('phase2').classList.add('active');
+      const highlighted = conceptMeshes.filter(m => matched.primaryNodes.includes(m.userData.name));
+      highlighted.forEach(m => {
+        gsap.to(m.scale, { x: 1.6, y: 1.6, z: 1.6, duration: 0.5 });
+        m.material.emissiveIntensity = 1.35;
+      });
+      await new Promise(r => setTimeout(r, 600));
+
+      // FASE 3: Enlaces de atención
+      document.getElementById('phase3').classList.add('active');
+      linksContainer.innerHTML = '';
+
+      matched.crossLinks.forEach(link => {
+        const meshA = conceptMeshes.find(m => m.userData.name === link.from);
+        const meshB = conceptMeshes.find(m => m.userData.name === link.to);
+
+        if (meshA && meshB) {
+          createDynamicLink(meshA.position, meshB.position, meshA.userData.color);
+          linksContainer.innerHTML += `
+            <div class="attention-link-card" style="border-left-color: ${meshA.userData.hex}">
+              <div class="d-flex justify-content-between align-items-center">
+                <strong>${link.from} &harr; ${link.to}</strong>
+                <span class="badge bg-primary bg-opacity-15 text-info font-orbitron" style="font-size:0.65rem">${(link.weight * 100).toFixed(0)}% de peso</span>
+              </div>
+              <div class="text-secondary small mt-1" style="font-size:0.78rem">${link.desc}</div>
+            </div>
+          `;
+        }
+      });
+
+      btnExplore.disabled = false;
+    }
+
+    // Controles HUD de zoom rápidos
+    function zoomIn() {
+      gsap.to(camera, { zoom: camera.zoom + 0.3, duration: 0.4, onUpdate: () => camera.updateProjectionMatrix() });
+    }
+    function zoomOut() {
+      if (camera.zoom > 0.5) {
+        gsap.to(camera, { zoom: camera.zoom - 0.3, duration: 0.4, onUpdate: () => camera.updateProjectionMatrix() });
+      }
+    }
+    function resetCamera() {
+      targetAura.visible = false;
+      document.getElementById('activeClusterDisplay').textContent = "SECTOR: Vista General";
+      document.getElementById('coordsDisplay').textContent = "X: 0.000 | Y: 0.000 | Z: 0.000";
+      
+      gsap.to(camera.position, { x: 0, y: 0, z: 30, duration: 1.2, ease: "power2.inOut" });
+      gsap.to(camera, { zoom: 1, duration: 0.8, onUpdate: () => camera.updateProjectionMatrix() });
+      gsap.to(controls.target, { x: 0, y: 0, z: 0, duration: 1.2, ease: "power2.inOut" });
+    }
+
+    // Loop de renderizado
+    function animate() {
+      requestAnimationFrame(animate);
+
+      universeGroup.rotation.y += 0.0004;
+
+      activePhotons.forEach(p => {
+        p.t += 0.015;
+        if (p.t > 1) p.t = 0;
+        p.mesh.position.copy(p.curve.getPoint(p.t));
+      });
+
+      if (targetAura.visible) {
+        targetAura.rotation.z += 0.02;
+        targetAura.lookAt(camera.position);
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    btnExplore.addEventListener('click', navigateLatentSpace);
+    userQuery.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigateLatentSpace(); });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    window.addEventListener('load', () => {
+      navigateLatentSpace();
+    });
+  </script>
+</body>
+</html>
